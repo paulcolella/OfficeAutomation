@@ -12,7 +12,7 @@ ThisDevice = device.device("device1", "off")
 ##SOCKET
 s = socket.socket()
 host = socket.gethostname()
-port = 7777
+port = 7776
 
 ##Start State/Variables
 deviceList = []
@@ -41,25 +41,30 @@ def handleData(data):
     if data == "SHUTDOWN":
         server_on = False
     else:
+        prevStatus = ThisDevice.status
+        print device.commandType(data)
         x = device.strToTup(data)
         currentStateDict[x[0]] = x[1]
+        print currentStateDict
         if x[0] == ThisDevice.name:
             ThisDevice.status = x[1]
         else:
             changeTest = 0
             if device.commandType(data) == "A":
                 for i in commandList:
+                    print i
                     var1 = True
                     stateList = makeStateList()
                     if x in i[0]:
                         for ii in i[0]:
+                            print ii
                             if ii not in stateList:
                                 var1 = False
                         if var1 == True:
                             ThisDevice.status = i[1]
                             changeTest += 1
-                if changeTest < 0:
-                    s.send(ThisDevice.state() + ' A')
+                if changeTest > 0 and prevStatus != ThisDevice.status:
+                    s.send(ThisDevice.name + ' ' + ThisDevice.status + ' A')
                 
             
             
@@ -71,6 +76,7 @@ while server_on:
     readable, writable, error = select.select([s],[s],[],5)
     if readable != []:
         data = s.recv(2048)
+        print data
         handleData(data)
 
 s.close()

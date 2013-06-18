@@ -8,7 +8,7 @@ import select
 s = socket.socket()
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 host = socket.gethostname()
-port = 7778
+port = 7776
 s.bind((host, port))
 
 ##Variables
@@ -41,3 +41,4 @@ while server_on:
                 ii.send(data)
 
 s.close()
+

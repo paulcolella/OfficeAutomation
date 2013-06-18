@@ -6,7 +6,7 @@ import socket
 
 s = socket.socket()
 host = socket.gethostname()
-port = 7777
+port = 7776
 
 root = Tk()
 
@@ -19,8 +19,7 @@ root.configure(background = "SteelBlue")
 ##then use the interface to add functions of that item
 ##please also remember to add new items to text
 
-deviceList = ["device1 on", "device1 off", "device2 on",\
-              "device2 off", "device2 on", "device2 off"]
+deviceList = ["device1 on", "device1 off", "device2 on", "device2 off", "device3 on", "device3 off"]
 
 ##Variables
 
@@ -28,6 +27,8 @@ EntryText1 = StringVar()
 EntryText2 = StringVar()
 statusReport = StringVar()
 Status = StringVar()
+
+s.connect((host,port))
 
 ##Functions:
 ##these build up the link between the input data and the brain
@@ -37,13 +38,32 @@ def statUp():
     text3.configure(text = statusReport.get())
     return
 
+def automatic():
+    print EntryText1.get()
+    print EntryText1.get() + " A"
+    if EntryText1.get() in deviceList:
+        print EntryText1.get() + " A"
+        s.send(EntryText1.get() + " A")
+        statusReport.set(s.recv(2048))
+        statUp()
+    if EntryText1.get() == "SHUTDOWN":
+        print "SHUTTING DOWN"
+        s.send("SHUTDOWN")
+        s.close
+
 
 def manual():
-    s.connect((host,port))
-    s.send(EntryText2.get())
-    statusReport.set(s.recv(2048))
-    statUp()
-    s.close
+    print EntryText2.get()
+    print EntryText2.get() + " M"
+    if EntryText2.get() in deviceList:
+        print EntryText2.get() + " M"
+        s.send(EntryText2.get() + " M")
+        statusReport.set(s.recv(2048))
+        statUp()
+    if EntryText2.get() == "SHUTDOWN":
+        print "SHUTTING DOWN"
+        s.send("SHUTDOWN")
+        s.close
 
         
 
@@ -71,7 +91,7 @@ entry1 = Entry(root, textvariable = EntryText1, width = 200, \
 
 button1 = Button(root, text = "SUBMIT", fg = "DarkGreen", \
                      bg = "SlateGray", activebackground = "BurlyWood", \
-                     font = "arial")
+                     font = "arial", command = automatic)
 
 text2 = Label(root, text = " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" \
               "MANUAL CONTROL", font = ("arial", 14), wraplength = 600, \
