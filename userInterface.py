@@ -3,10 +3,8 @@
 
 from Tkinter import *
 import socket
+import time
 
-s = socket.socket()
-host = socket.gethostname()
-port = 7776
 
 root = Tk()
 
@@ -28,12 +26,21 @@ EntryText2 = StringVar()
 statusReport = StringVar()
 Status = StringVar()
 
-s.connect((host,port))
-
 ##Functions:
 ##these build up the link between the input data and the brain
 ##first they will check the validity of the input then they will
 ##determin which action to take
+
+def connectAndSend(data):
+    s = socket.socket()
+    host = socket.gethostname()
+    port = 7776
+    s.connect((host,port))
+    s.send(data)
+    time.sleep(1)
+    s.send("User")
+    s.close()
+
 def statUp():
     text3.configure(text = statusReport.get())
     return
@@ -43,27 +50,24 @@ def automatic():
     print EntryText1.get() + " A"
     if EntryText1.get() in deviceList:
         print EntryText1.get() + " A"
-        s.send(EntryText1.get() + " A")
-        statusReport.set(s.recv(2048))
+        connectAndSend(EntryText1.get() + " A")
+        statusReport.set(EntryText1.get() + " A")
         statUp()
     if EntryText1.get() == "SHUTDOWN":
         print "SHUTTING DOWN"
-        s.send("SHUTDOWN")
-        s.close
-
+        connectAndSend("SHUTDOWN")
 
 def manual():
     print EntryText2.get()
     print EntryText2.get() + " M"
-    if EntryText2.get() in deviceList:
-        print EntryText2.get() + " M"
-        s.send(EntryText2.get() + " M")
-        statusReport.set(s.recv(2048))
+    if EntryText1.get() in deviceList:
+        print EntryText1.get() + " M"
+        connectAndSend(EntryText2.get() + " M")
+        statusReport.set(EntryText2.get() + " M")
         statUp()
     if EntryText2.get() == "SHUTDOWN":
         print "SHUTTING DOWN"
-        s.send("SHUTDOWN")
-        s.close
+        connectAndSend("SHUTDOWN")
 
         
 

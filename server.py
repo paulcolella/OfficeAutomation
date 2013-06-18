@@ -14,12 +14,16 @@ s.bind((host, port))
 ##Variables
 RcList = [s]    ##Readable Connection List
 WcList = []     ##Writeable Connection List
+UserList = []
 server_on = True
 
 
 ##Functions
 
-
+def removeConnection(connection):
+    RcList.remove(connection)
+    WcList.remove(connection)
+    
         
 ##Server Operation: this will bounce the data as it is sent in
 ##to all the connected devices
@@ -33,12 +37,19 @@ while server_on:
         WcList.append(client_socket)
         readable.remove(s)
     for i in readable:
-        data = i.recv(2048)  ##if this is not enough increase number by x2
-        print data
-        if data == "SHUTDOWN":
-            server_on = False
-        for ii in writable:
-                ii.send(data)
+        data = i.recv(2048)
+        if data == "User":
+            removeConnection(i)
+            readable.remove(i)
+            writable.remove(i)
+            i.close()
+            print str(i) + " removed"
+        else:
+            print data
+            if data == "SHUTDOWN":
+                server_on = False
+            for ii in writable:
+                    ii.send(data)
 
 s.close()
 
